@@ -6,14 +6,23 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { MonitorLinkService } from './monitor-link.service';
 import { CreateMonitorLinkDto } from './dto/create-monitor-link.dto';
 import { UpdateMonitorLinkDto } from './dto/update-monitor-link.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('monitor-link')
 export class MonitorLinkController {
   constructor(private readonly monitorLinkService: MonitorLinkService) {}
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
+    return this.monitorLinkService.processCSV(file.buffer);
+  }
 
   @Post()
   create(@Body() createMonitorLinkDto: CreateMonitorLinkDto) {
